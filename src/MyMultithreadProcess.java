@@ -37,39 +37,24 @@ public class MyMultithreadProcess extends Application {
 		horizontalBoxes = new HBox[arrayProcessId.size()];
 		
 		//creating stage and scene with process information
-		//TODO VBox mainLayout = new VBox(20);
 		mainWindow = primaryStage;
 		mainWindow.setTitle("Multithread Processing");
 		
-		for(int i=0; i < horizontalBoxes.length; i++) {
-			String processId = arrayProcessId.get(i);
-			
-			//Thread monitoring button
-			Label labelId = new Label("Process ID " + processId);
-			Button button = new Button();
-			button.setText("Monitor process " + processId);
-			button.setOnAction(e -> mainWindow.setScene(individualScene));
-			
-			//adding individual button to the scene
-			final HBox individualHB = horizontalBoxes[i] = new HBox();
-			horizontalBoxes[i].setSpacing(20);
-			horizontalBoxes[i].setAlignment(Pos.CENTER);
-			horizontalBoxes[i].getChildren().addAll(labelId, button);
-		}
-		
 		//adding all individual horizontal boxes
+		addIndividualHorizontalBox();
+		
+		//adding all horizontal boxes to the main vertical one
+		VBox verticalBox = addHorizontalBoxToVertical();
+		
+		//setting up individual process information scene
+		createIndividualProcessScene();
+		
+		//Setting the scene and showing the mainWindow
+		setSceneShowWindow(verticalBox);
+		
 		//TODO
-		scrollPane = new ScrollPane();
-		scrollPane.setFitToHeight(true);
-		
-	    final VBox verticalBoxes = new VBox();
-	    verticalBoxes.setSpacing(20);
-	    verticalBoxes.getChildren().addAll(horizontalBoxes);
-	    verticalBoxes.getChildren().add(scrollPane);
-		processIdScene = new Scene (verticalBoxes, 200, 200);
-		
-		mainWindow.setScene(processIdScene);
-		mainWindow.show();
+//		scrollPane = new ScrollPane();
+//		scrollPane.setFitToHeight(true);
 	}
 	
 	private ArrayList<String> displayProcessesSettup() {
@@ -107,5 +92,52 @@ public class MyMultithreadProcess extends Application {
         }
         //extra information, not process id
 		return null;
+	}
+	
+	private void addIndividualHorizontalBox() {
+		for(int i=0; i < horizontalBoxes.length; i++) {
+			String processId = arrayProcessId.get(i);
+			
+			//Thread monitoring button
+			Label labelId = new Label("Process ID " + processId);
+			Button button = new Button();
+			button.setText("Monitor process " + processId);
+			button.setOnAction(e -> mainWindow.setScene(individualScene));
+			
+			//adding individual button to the scene
+			final HBox individualHB = horizontalBoxes[i] = new HBox();
+			horizontalBoxes[i].setSpacing(20);
+			horizontalBoxes[i].setAlignment(Pos.CENTER);
+			horizontalBoxes[i].getChildren().addAll(labelId, button);
+		}
+	}
+	
+	private VBox addHorizontalBoxToVertical() {
+		VBox verticalBox = new VBox();
+		verticalBox.setSpacing(20);
+		verticalBox.getChildren().addAll(horizontalBoxes);
+	    return verticalBox;
+	}
+	
+	private void createIndividualProcessScene() {
+		//creating scene for individual process monitoring
+		Label cpuMemoryLabel = new Label("CPU AND MEMO SCHTUFF ");
+		Button button = new Button();
+		button.setText("Stop monitoring process with ID ");
+		button.setOnAction(e -> mainWindow.setScene(processIdScene));
+		
+		//creating horizontal box holding monitoring information
+		final HBox horizontalBox = new HBox();
+		horizontalBox.setSpacing(20);
+		horizontalBox.setAlignment(Pos.CENTER);
+		horizontalBox.getChildren().addAll(cpuMemoryLabel, button);
+		
+		individualScene = new Scene (horizontalBox, 500, 500);
+	}
+	
+	private void setSceneShowWindow(VBox verticalBox) {
+		processIdScene = new Scene (verticalBox, 500, 500);
+		mainWindow.setScene(processIdScene);
+		mainWindow.show();
 	}
 }
