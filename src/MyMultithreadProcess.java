@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -45,10 +46,7 @@ public class MyMultithreadProcess extends Application {
 		
 		//adding all horizontal boxes to the main vertical one
 		VBox verticalBox = addHorizontalBoxToVertical();
-		
-		//setting up individual process information scene
-		createIndividualProcessScene();
-		
+
 		//Setting the scene and showing the mainWindow
 		setSceneShowWindow(verticalBox);
 		
@@ -102,10 +100,14 @@ public class MyMultithreadProcess extends Application {
 			Label labelId = new Label("Process ID " + processId);
 			Button button = new Button();
 			button.setText("Monitor process " + processId);
-			button.setOnAction(e -> mainWindow.setScene(individualScene));
+			button.setOnAction(e -> {
+				//setting up individual process information scene
+				createIndividualProcessScene(Integer.parseInt(processId));
+				mainWindow.setScene(individualScene);
+				});
 			
 			//adding individual button to the scene
-			final HBox individualHB = horizontalBoxes[i] = new HBox();
+			horizontalBoxes[i] = new HBox();
 			horizontalBoxes[i].setSpacing(20);
 			horizontalBoxes[i].setAlignment(Pos.CENTER);
 			horizontalBoxes[i].getChildren().addAll(labelId, button);
@@ -119,11 +121,12 @@ public class MyMultithreadProcess extends Application {
 	    return verticalBox;
 	}
 	
-	private void createIndividualProcessScene() {
+	private void createIndividualProcessScene(int chosenProcessID) {
 		//creating scene for individual process monitoring
-		Label cpuMemoryLabel = new Label("CPU AND MEMO SCHTUFF ");
+		String cpuMemoInformation = displayCpuAndMemoryStorageUtilization(chosenProcessID);
+		Label cpuMemoryLabel = new Label(cpuMemoInformation);
 		Button button = new Button();
-		button.setText("Stop monitoring process with ID ");
+		button.setText("Stop monitoring process with ID " + chosenProcessID);
 		button.setOnAction(e -> mainWindow.setScene(processIdScene));
 		
 		//creating horizontal box holding monitoring information
@@ -139,5 +142,27 @@ public class MyMultithreadProcess extends Application {
 		processIdScene = new Scene (verticalBox, 500, 500);
 		mainWindow.setScene(processIdScene);
 		mainWindow.show();
+	}
+	
+	private String displayCpuAndMemoryStorageUtilization(int processId) {
+	    String processOutput = "";
+		String processLine;
+	    Process process;
+	    
+		try {
+			process = Runtime.getRuntime().exec("ps -p " + processId + " -o %cpu,%mem");
+		    BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		    
+		    while ((processLine = input.readLine()) != null) {
+		    	//display cpu and memory utilization
+		    	processOutput += processLine + "\n";
+		    	System.out.println(processLine);
+		    }
+		    input.close();
+		    return processOutput;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
