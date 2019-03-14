@@ -16,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -113,10 +114,21 @@ public class MyMultithreadProcess extends Application {
 		button.setOnAction(e -> {
 			//setting up monitor process information scene
 			ArrayList<Integer> listSelectedProcess = new ArrayList<Integer>();
+			
+			
 			listSelectedProcess = findSelectedProcessToMonitor(horizontalBoxes, listSelectedProcess);
-			createMonitorProcessScene(listSelectedProcess);
-			mainWindow.setScene(monitorScene);
-			});
+			
+			//no selected process causes alert
+			if(listSelectedProcess.size() == 0) {
+				EmptyProcessSelectionAlert.displayAlert("No Selected Process",
+						"Please select a minimum of one process to monitor.");
+			}
+			//minimum of 1 selected process
+			else {
+				createMonitorProcessScene(listSelectedProcess);
+				mainWindow.setScene(monitorScene);
+			}
+		});
 		horizontalBoxes[horizontalBoxes.length - 1]= new HBox();
 		horizontalBoxes[horizontalBoxes.length - 1].getChildren().add(button);
 	}
@@ -128,7 +140,7 @@ public class MyMultithreadProcess extends Application {
 	    return verticalBox;
 	}
 	
-	private ArrayList<Integer> findSelectedProcessToMonitor(HBox[] horizontalBoxes, ArrayList<Integer> listSelectedProcess) {
+	private ArrayList<Integer> findSelectedProcessToMonitor(HBox[] horizontalBoxes, ArrayList<Integer> listSelectedProcess) {		
 		for(int i=0; i < horizontalBoxes.length-1; i++) {
 			CheckBox checkBox = (CheckBox) horizontalBoxes[i].getChildren().get(0);
 			if(checkBox.isSelected()) {
@@ -140,44 +152,54 @@ public class MyMultithreadProcess extends Application {
 	}
 	
 	private void createMonitorProcessScene(ArrayList<Integer> listSelectedProcess) {
+		//creating horizontal box holding monitoring information
+		final VBox verticalBox = new VBox();
+		verticalBox.setSpacing(20);
+		verticalBox.setAlignment(Pos.CENTER);
+				
 		//creating as many threads as there are selected processes
-		String threadOutputs = createParallelThreads(listSelectedProcess);
+		String[] threadOutputs = createParallelThreads(listSelectedProcess);
 		
-		//creating scene for individual process monitoring
-		Label cpuMemoryLabel = new Label(threadOutputs);
+		//creating scene for parallel process monitoring
+		for(int i=0; i < threadOutputs.length; i++) {
+			verticalBox.getChildren().add(new Label(threadOutputs[i]));
+		}
+
 		Button button = new Button();
 		button.setText("Stop monitoring and return");
 		button.setOnAction(e -> mainWindow.setScene(processIdScene));
+		verticalBox.getChildren().add(button);
 		
-		//creating horizontal box holding monitoring information
-		final HBox horizontalBox = new HBox();
-		horizontalBox.setSpacing(20);
-		horizontalBox.setAlignment(Pos.CENTER);
-		horizontalBox.getChildren().addAll(cpuMemoryLabel, button);
-		
-		monitorScene = new Scene (horizontalBox, 500, 500);
+		scrollPane = settingScrollPane(verticalBox);
+		monitorScene = new Scene (scrollPane, 500, 500);
 	}
 	
-	private String createParallelThreads(ArrayList<Integer> listSelectedProcess) {
-		String informationAllProcess = "";
+	private String[] createParallelThreads(ArrayList<Integer> listSelectedProcess) {
+		String[] informationAllProcess = new String[listSelectedProcess.size()];
 		
 		for(int i=0; i < listSelectedProcess.size(); i++) {
 			ProcessThread thread = new ProcessThread(listSelectedProcess.get(i));
 			thread.run();
-			informationAllProcess += thread.toString() + "\n";
+			informationAllProcess[i] = thread.toString() + "\n";
 		}
 		return informationAllProcess;
 	}
 	
 	private void setSceneShowWindow(VBox verticalBox) {
-		scrollPane = new ScrollPane();
-		scrollPane.setContent(verticalBox);
-		scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
-		scrollPane.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
-		scrollPane.setFitToHeight(true);
+		scrollPane = settingScrollPane(verticalBox);
 		processIdScene = new Scene (scrollPane, 500, 500);
 		
 		mainWindow.setScene(processIdScene);
 		mainWindow.show();
+	}
+	
+	private ScrollPane settingScrollPane(Pane box) {
+		scrollPane = new ScrollPane();
+		scrollPane.setContent(box);
+		scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+		scrollPane.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
+		scrollPane.setFitToHeight(true);
+		
+		return scrollPane;
 	}
 }
