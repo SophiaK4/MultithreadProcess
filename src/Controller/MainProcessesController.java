@@ -24,6 +24,15 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+/**
+ * @author Sophia Kavousifard
+ *	Main controller that finds all process on computer
+ *	to then display on the view followed by check box
+ *	for selection and a monitor button.
+ *	On click, monitor button will set the scene from 
+ *	processIdScene to monitorScene along with a stop
+ *	monitoring button.
+ */
 public class MainProcessesController implements Initializable{
 	@FXML private ArrayList<String> arrayProcessId;
 	@FXML private HBox[] horizontalBoxes;
@@ -33,6 +42,14 @@ public class MainProcessesController implements Initializable{
 	@FXML private ScrollPane scrollPane;
 
 	@Override
+	/**
+	 *	On load of MainProcessesView.fxml view
+	 *	this method is called to setup the list
+	 *	of processes running on computer to then
+	 *	put them in separate horizontal boxes to
+	 *	be displayed. The transition between both
+	 *	scenes is also done here.
+	 */
 	public void initialize(URL location, ResourceBundle resources) {
 		//finds information of all running processes
 		arrayProcessId = displayProcessesSettup();
@@ -47,11 +64,17 @@ public class MainProcessesController implements Initializable{
 		
 		//adding all horizontal boxes to the main vertical one
 		VBox verticalBox = addHorizontalBoxToVertical();
+		verticalBox.setMinWidth(500);
 		
 		//Setting the scene and showing the mainWindow
 		setSceneShowWindow(verticalBox);
 	}
 	
+	/**
+	 *	Extracts all processes ID to be displayed 
+	 *	on main processIdScene 
+	 *	@return list of running processes on computer
+	 */
 	private ArrayList<String> displayProcessesSettup() {
 		try {
 			ArrayList<String> arrayProcessId = new ArrayList<String>();
@@ -77,6 +100,11 @@ public class MainProcessesController implements Initializable{
 		}
 	}
 	
+	/**
+	 *	Extracts the ID from the linux command
+	 *	@param processLine information returned by the command
+	 *	@return ID of process
+	 */
 	private static String displayProcessId(String processLine) {
 		//regex to find positive process id number
 		Pattern p = Pattern.compile("\\d+");
@@ -89,6 +117,16 @@ public class MainProcessesController implements Initializable{
 		return null;
 	}
 	
+	/**
+	 *	Puts all processes individually into HBox on
+	 *	processIdScene initially displayed.
+	 *	Then puts each selected process within a HBox
+	 *	to later be displayed on monitorScene.
+	 *	Linkage between the two scenes is done using
+	 *	a button's setOnAction expression.
+	 *	Method also verifies that a minimum
+	 *	of one process is selected to monitor. 
+	 */
 	private void addIndividualHorizontalBox() {
 		for(int i=0; i < horizontalBoxes.length - 1; i++) {
 			String processId = arrayProcessId.get(i);
@@ -123,8 +161,15 @@ public class MainProcessesController implements Initializable{
 		});
 		horizontalBoxes[horizontalBoxes.length - 1]= new HBox();
 		horizontalBoxes[horizontalBoxes.length - 1].getChildren().add(button);
+		horizontalBoxes[horizontalBoxes.length - 1].setMinWidth(500);
 	}
 	
+	/**
+	 *	Verifies the states of each check box
+	 *	@param horizontalBoxes holds individual check boxes
+	 *	@param listSelectedProcess processes to be monitored
+	 *	@return list of processes to be monitored
+	 */
 	private ArrayList<Integer> findSelectedProcessToMonitor(HBox[] horizontalBoxes, ArrayList<Integer> listSelectedProcess) {		
 		for(int i=0; i < horizontalBoxes.length-1; i++) {
 			CheckBox checkBox = (CheckBox) horizontalBoxes[i].getChildren().get(0);
@@ -136,11 +181,16 @@ public class MainProcessesController implements Initializable{
 		return listSelectedProcess;
 	}
 	
+	/**
+	 *	Creates monitorScene based on the selected processes
+	 *	@param listSelectedProcess list of process IDs
+	 */
 	private void createMonitorProcessScene(ArrayList<Integer> listSelectedProcess) {
 		//creating horizontal box holding monitoring information
 		final VBox verticalBox = new VBox();
 		verticalBox.setSpacing(20);
 		verticalBox.setAlignment(Pos.CENTER);
+		verticalBox.setMinWidth(500);
 				
 		//creating as many threads as there are selected processes
 		String[] threadOutputs = createParallelThreads(listSelectedProcess);
@@ -159,6 +209,13 @@ public class MainProcessesController implements Initializable{
 		monitorScene = new Scene (scrollPane, 500, 500);
 	}
 	
+	/**
+	 *	Creates n threads to be executed in parallel
+	 *	where n is the number of selected processes
+	 *	@param listSelectedProcess list of selected processes
+	 *	@return array where each index corresponds to the CPU
+	 *	and Memory information of a singular process
+	 */
 	private String[] createParallelThreads(ArrayList<Integer> listSelectedProcess) {
 		String[] informationAllProcess = new String[listSelectedProcess.size()];
 		
@@ -170,6 +227,11 @@ public class MainProcessesController implements Initializable{
 		return informationAllProcess;
 	}
 	
+	/**
+	 *	Surrounds a Hbox and VBox with a ScrollPane
+	 *	@param box instance of Hbox or VBox
+	 *	@return ScrollPane with a box inside
+	 */
 	private ScrollPane settingScrollPane(Pane box) {
 		scrollPane = new ScrollPane();
 		scrollPane.setContent(box);
@@ -180,6 +242,11 @@ public class MainProcessesController implements Initializable{
 		return scrollPane;
 	}
 	
+	/**
+	 *	Adds individual processes in HBox to one 
+	 *	general VBox to be displayed on processIdScene
+	 *	@return	VBox with all HBox and button element
+	 */
 	private VBox addHorizontalBoxToVertical() {
 		VBox verticalBox = new VBox();
 		verticalBox.setSpacing(20);
@@ -187,6 +254,10 @@ public class MainProcessesController implements Initializable{
 	    return verticalBox;
 	}
 	
+	/**
+	 *	Displaying the stage as the application begins
+	 *	@param verticalBox contains all process IDs
+	 */
 	private void setSceneShowWindow(VBox verticalBox) {
 		scrollPane = settingScrollPane(verticalBox);
 		processIdScene = new Scene (scrollPane, 500, 500);

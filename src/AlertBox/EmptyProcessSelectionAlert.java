@@ -8,10 +8,17 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
- * @author Sophia Kavousifard
- *
+ *	@author Sophia Kavousifard
+ *	Alert message box for empty selection
  */
 public class EmptyProcessSelectionAlert {
+	/**
+	 *	Alert box notifies user that they
+	 *	have not selected any processes to
+	 *	monitor and that they must try again.
+	 *	@param title title of the alert box
+	 *	@param message message to user
+	 */
 	public static void displayAlert(String title, String message) {
 		Stage window = new Stage();
 		window.initModality(Modality.APPLICATION_MODAL);

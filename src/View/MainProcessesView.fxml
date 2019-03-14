@@ -2,6 +2,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import Controller.MainProcessesController?>
 
+<!-- View displaying all processes and their ID
+	with check boxes in order to monitor them
+	in parallel using ProcessThread class-->
 <VBox 	xmlns:fx="http://javafx.com/fxml/1">
 	
 </VBox>
