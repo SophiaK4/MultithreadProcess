@@ -1,3 +1,4 @@
+package Thread;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,7 +11,7 @@ public class ProcessThread implements Runnable {
 	private int name;//name is the process ID
 	private String processOutput;
 	
-	ProcessThread(int name) {
+	public ProcessThread(int name) {
 		this.name = name;
 	}
 	
