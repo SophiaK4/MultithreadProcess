@@ -87,7 +87,6 @@ public class MainProcessesController implements Initializable{
 		    	String processId = displayProcessId(processLine);
 		    	if(processId != null) {
 		    		arrayProcessId.add(processId);
-			    	System.out.println(processId);
 			        System.out.println(processLine);
 		    	}
 		    }
@@ -159,9 +158,10 @@ public class MainProcessesController implements Initializable{
 				mainWindow.setScene(monitorScene);
 			}
 		});
+		
 		horizontalBoxes[horizontalBoxes.length - 1]= new HBox();
+		horizontalBoxes[horizontalBoxes.length - 1].setAlignment(Pos.CENTER);
 		horizontalBoxes[horizontalBoxes.length - 1].getChildren().add(button);
-		horizontalBoxes[horizontalBoxes.length - 1].setMinWidth(500);
 	}
 	
 	/**
@@ -197,7 +197,9 @@ public class MainProcessesController implements Initializable{
 		
 		//creating scene for parallel process monitoring
 		for(int i=0; i < threadOutputs.length; i++) {
-			verticalBox.getChildren().add(new Label(threadOutputs[i]));
+			Label label = new Label(threadOutputs[i]);
+			label.setMinHeight(50);
+			verticalBox.getChildren().add(label);
 		}
 
 		Button button = new Button();

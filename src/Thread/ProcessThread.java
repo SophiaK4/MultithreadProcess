@@ -56,6 +56,12 @@ public class ProcessThread implements Runnable {
 		    	processOutput += processLine + "\n";
 		    	System.out.println(processLine);
 		    }
+		    
+		    //removing word null form output
+		    if(processOutput.contains("null")) {
+		    	processOutput = processOutput.replaceAll("null", "");
+		    }
+		    
 		    input.close();
 		} catch (IOException e) {
 			e.printStackTrace();
